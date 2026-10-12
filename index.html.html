@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="vi" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniManage Pro - Multi-Channel Ads, GA4, Stock & Team Workflow</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(100,116,139,0.3); border-radius: 9999px; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200 custom-scrollbar">
+
+    <!-- Top Header Bar -->
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-r from-brand-600 to-indigo-700 text-white p-2.5 rounded-xl shadow-md flex items-center justify-center">
+                    <i class="fa-solid fa-layer-group text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
+                        OmniManage Pro 
+                        <span class="text-[10px] bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-300 font-semibold px-2 py-0.5 rounded-full border border-brand-200 dark:border-brand-800">v2.5 Team Hub</span>
+                    </h1>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">FB • TikTok • Google • GA4 • Stock • Team Delegation</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Quick Stats Badge -->
+                <div class="hidden lg:flex items-center space-x-3 text-xs bg-slate-100 dark:bg-slate-700/50 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600">
+                    <div><span class="text-slate-400">Nhân sự:</span> <strong id="headerMemberCount" class="text-slate-700 dark:text-slate-200">0</strong></div>
+                    <span class="text-slate-300 dark:text-slate-600">|</span>
+                    <div><span class="text-slate-400">Team:</span> <strong id="headerTeamCount" class="text-slate-700 dark:text-slate-200">5</strong></div>
+                </div>
+
+                <!-- Theme Switcher -->
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition" title="Đổi Chế độ Sáng/Tối">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+                <!-- User Profile -->
+                <div class="flex items-center space-x-2 border-l pl-4 border-slate-200 dark:border-slate-700">
+                    <img class="w-9 h-9 rounded-full object-cover border-2 border-brand-500 shadow-sm" src="https://placehold.co/100x100/4f46e5/ffffff?text=AD" alt="Admin">
+                    <div class="hidden md:block text-left">
+                        <div class="text-xs font-semibold">Admin Tổng Quản</div>
+                        <div class="text-[10px] text-slate-500 dark:text-slate-400">Trưởng Trực Điều Hành</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm sticky top-16 z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex space-x-1 sm:space-x-6 overflow-x-auto custom-scrollbar">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn py-3.5 px-3 border-b-2 font-medium text-sm flex items-center space-x-2 border-brand-600 text-brand-600 dark:text-brand-400 whitespace-nowrap transition">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard Tổng Quan</span>
+                </button>
+                <button onclick="switchTab('workflow')" id="tab-workflow" class="tab-btn py-3.5 px-3 border-b-2 font-medium text-sm flex items-center space-x-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 whitespace-nowrap transition">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Giao Việc & Tiến Độ (Tasks)</span>
+                </button>
+                <button onclick="switchTab('teams')" id="tab-teams" class="tab-btn py-3.5 px-3 border-b-2 font-medium text-sm flex items-center space-x-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 whitespace-nowrap transition">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>Quản Lý Teams & Nhân Sự</span>
+                </button>
+                <button onclick="switchTab('ads')" id="tab-ads" class="tab-btn py-3.5 px-3 border-b-2 font-medium text-sm flex items-center space-x-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 whitespace-nowrap transition">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>Báo Cáo Ads & GA4</span>
+                </button>
+                <button onclick="switchTab('stock')" id="tab-stock" class="tab-btn py-3.5 px-3 border-b-2 font-medium text-sm flex items-center space-x-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 whitespace-nowrap transition">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    <span>Tracking Kho Hàng</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+        
+        <!-- ================= TAB 1: DASHBOARD ================= -->
+        <section id="view-dashboard" class="space-y-6">
+            <!-- Filter Bar -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <span class="text-sm font-medium text-slate-600 dark:text-slate-300"><i class="fa-solid fa-calendar-days mr-2"></i>Thời gian:</span>
+                    <select id="dashTimeFilter" onchange="renderDashboardStats()" class="bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="today">Hôm nay</option>
+                        <option value="7days">7 ngày qua</option>
+                        <option value="30days" selected>30 ngày qua</option>
+                        <option value="this_month">Tháng này</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-4 text-xs text-slate-500 dark:text-slate-400">
+                    <span class="flex items-center"><i class="fa-solid fa-circle text-emerald-500 text-[10px] mr-1.5"></i> FB/TikTok/Google Live</span>
+                    <span class="flex items-center"><i class="fa-solid fa-circle text-brand-500 text-[10px] mr-1.5"></i> GA4 API Connected</span>
+                </div>
+            </div>
+
+            <!-- Dashboard Metric Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-brand-500/50 transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng Ngân Sách Ads</span>
+                        <div class="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl"><i class="fa-solid fa-wallet text-base"></i></div>
+                    </div>
+                    <div class="mt-4 flex items-baseline justify-between">
+                        <h2 id="metricTotalSpend" class="text-2xl font-bold text-slate-900 dark:text-white">0 ₫</h2>
+                        <span class="text-xs text-emerald-600 font-semibold flex items-center"><i class="fa-solid fa-arrow-up mr-1"></i>+14.2%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-brand-500/50 transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Doanh Thu Đo Lường (GA4)</span>
+                        <div class="p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl"><i class="fa-solid fa-money-bill-trend-up text-base"></i></div>
+                    </div>
+                    <div class="mt-4 flex items-baseline justify-between">
+                        <h2 id="metricTotalRevenue" class="text-2xl font-bold text-slate-900 dark:text-white">0 ₫</h2>
+                        <span class="text-xs text-emerald-600 font-semibold flex items-center"><i class="fa-solid fa-arrow-up mr-1"></i>+19.8%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-brand-500/50 transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">ROAS Trung Bình</span>
+                        <div class="p-2 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl"><i class="fa-solid fa-chart-pie text-base"></i></div>
+                    </div>
+                    <div class="mt-4 flex items-baseline justify-between">
+                        <h2 id="metricAvgRoas" class="text-2xl font-bold text-slate-900 dark:text-white">0.0x</h2>
+                        <span class="text-xs text-brand-600 dark:text-brand-400 font-semibold">KPI > 3.0x</span>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-brand-500/50 transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Công Việc / Cảnh Báo</span>
+                        <div class="p-2 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl"><i class="fa-solid fa-list-check text-base"></i></div>
+                    </div>
+                    <div class="mt-4 flex items-baseline justify-between">
+                        <h2 id="metricTaskStats" class="text-xl font-bold text-slate-900 dark:text-white">0 Việc Đang Mở</h2>
+                        <span id="metricLowStock" class="text-xs text-rose-600 font-semibold">0 SKU hết kho</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 lg:col-span-2">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-base text-slate-900 dark:text-white">Chi Tiêu Ads & Doanh Thu GA4</h3>
+                        <span class="text-xs text-slate-400">Theo dõi hàng ngày</span>
+                    </div>
+                    <div class="h-72 relative">
+                        <canvas id="spendRevenueChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-base text-slate-900 dark:text-white">Tỷ Trọng Chi Tiêu Theo Kênh</h3>
+                    </div>
+                    <div class="h-72 relative flex items-center justify-center">
+                        <canvas id="platformChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: WORKFLOW & DELEGATION ================= -->
+        <section id="view-workflow" class="hidden space-y-6">
+            <!-- Header Bar -->
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>Hệ Thống Giao Việc & Điều Hành Nhân Sự</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Giao việc cho Media Buyer, Content, Design, Kho & CSKH theo từng dự án/kênh Ads.</p>
+                </div>
+                <div class="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-end">
+                    <!-- Toggle View Mode (Kanban vs List) -->
+                    <div class="bg-slate-100 dark:bg-slate-700 p-1 rounded-xl flex items-center text-xs">
+                        <button onclick="setTaskView('kanban')" id="btnViewKanban" class="px-3 py-1.5 rounded-lg font-medium transition bg-white dark:bg-slate-800 shadow-sm text-brand-600 dark:text-brand-400">
+                            <i class="fa-solid fa-table-columns mr-1"></i> Kanban
+                        </button>
+                        <button onclick="setTaskView('list')" id="btnViewList" class="px-3 py-1.5 rounded-lg font-medium transition text-slate-500 dark:text-slate-400 hover:text-slate-800">
+                            <i class="fa-solid fa-list-ul mr-1"></i> List View
+                        </button>
+                    </div>
+                    <button onclick="openTaskModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-md shadow-brand-500/20 transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Giao Việc Mới</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task Filter Bar -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-slate-500 font-medium">Lọc Team:</span>
+                        <select id="taskFilterTeam" onchange="renderTasks()" class="bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="ALL">Tất cả Teams</option>
+                            <option value="Team Media / Ads">Team Media / Ads</option>
+                            <option value="Team Content">Team Content</option>
+                            <option value="Team Design / Video">Team Design / Video</option>
+                            <option value="Team Logistics / Kho">Team Logistics / Kho</option>
+                            <option value="Team CSKH / Sales">Team CSKH / Sales</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-slate-500 font-medium">Nhân sự:</span>
+                        <select id="taskFilterAssignee" onchange="renderTasks()" class="bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="ALL">Tất cả người làm</option>
+                            <!-- Dynamic Populated -->
+                        </select>
+                    </div>
+
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-slate-500 font-medium">Mức độ:</span>
+                        <select id="taskFilterPriority" onchange="renderTasks()" class="bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="ALL">Tất cả mức độ</option>
+                            <option value="Gấp">Gấp (Urgent)</option>
+                            <option value="Cao">Cao</option>
+                            <option value="Trung bình">Trung bình</option>
+                            <option value="Thấp">Thấp</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="relative w-full sm:w-auto">
+                    <input type="text" id="taskSearchKeyword" oninput="renderTasks()" placeholder="Tìm tên công việc..." class="w-full sm:w-48 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <i class="fa-solid fa-search absolute left-2.5 top-2.5 text-slate-400"></i>
+                </div>
+            </div>
+
+            <!-- KANBAN BOARD VIEW -->
+            <div id="taskKanbanContainer" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Col 1: Todo -->
+                <div class="bg-slate-100/70 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/80 flex flex-col">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                            <span>Cần Làm (To Do)</span>
+                        </h3>
+                        <span id="countTodo" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+                    <div id="colTodo" class="mt-3 space-y-3 flex-grow min-h-[300px] custom-scrollbar max-h-[650px] overflow-y-auto pr-1"></div>
+                </div>
+
+                <!-- Col 2: In Progress -->
+                <div class="bg-slate-100/70 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/80 flex flex-col">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                            <span>Đang Làm (In Progress)</span>
+                        </h3>
+                        <span id="countInProgress" class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+                    <div id="colInProgress" class="mt-3 space-y-3 flex-grow min-h-[300px] custom-scrollbar max-h-[650px] overflow-y-auto pr-1"></div>
+                </div>
+
+                <!-- Col 3: In Review -->
+                <div class="bg-slate-100/70 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/80 flex flex-col">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            <span>Đang Review / Duyệt</span>
+                        </h3>
+                        <span id="countInReview" class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+                    <div id="colInReview" class="mt-3 space-y-3 flex-grow min-h-[300px] custom-scrollbar max-h-[650px] overflow-y-auto pr-1"></div>
+                </div>
+
+                <!-- Col 4: Done -->
+                <div class="bg-slate-100/70 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/80 flex flex-col">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span>Hoàn Thành (Done)</span>
+                        </h3>
+                        <span id="countDone" class="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+                    <div id="colDone" class="mt-3 space-y-3 flex-grow min-h-[300px] custom-scrollbar max-h-[650px] overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+
+            <!-- LIST VIEW (Hidden by default) -->
+            <div id="taskListContainer" class="hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-700">
+                                <th class="p-3">Công Việc</th>
+                                <th class="p-3">Người Làm / Team</th>
+                                <th class="p-3">Kênh Liên Quan</th>
+                                <th class="p-3 text-center">Ưu Tiên</th>
+                                <th class="p-3">Deadline</th>
+                                <th class="p-3 text-center">KPI Points</th>
+                                <th class="p-3 text-center">Trạng Thái</th>
+                                <th class="p-3 text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="taskListBody" class="divide-y divide-slate-200 dark:divide-slate-700 text-sm">
+                            <!-- Dynamic populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: TEAM & PERSONNEL MANAGEMENT ================= -->
+        <section id="view-teams" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">Danh Sách Nhân Sự & Phân Phối Team</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Quản lý đội ngũ phòng ban Marketing & Vận hành Multi-Channel.</p>
+                </div>
+                <button onclick="openMemberModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-md shadow-brand-500/20 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Thêm Nhân Sự Mới</span>
+                </button>
+            </div>
+
+            <!-- Filter By Team -->
+            <div class="flex items-center space-x-2 overflow-x-auto pb-1 custom-scrollbar">
+                <button onclick="filterMemberByTeam('ALL')" class="team-filter-btn px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-sm transition whitespace-nowrap" data-team="ALL">
+                    Tất Cả Team
+                </button>
+                <button onclick="filterMemberByTeam('Team Media / Ads')" class="team-filter-btn px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-200 transition whitespace-nowrap" data-team="Team Media / Ads">
+                    <i class="fa-solid fa-rectangle-ad text-blue-500 mr-1"></i> Team Media / Ads
+                </button>
+                <button onclick="filterMemberByTeam('Team Content')" class="team-filter-btn px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-200 transition whitespace-nowrap" data-team="Team Content">
+                    <i class="fa-solid fa-pen-nib text-purple-500 mr-1"></i> Team Content
+                </button>
+                <button onclick="filterMemberByTeam('Team Design / Video')" class="team-filter-btn px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-200 transition whitespace-nowrap" data-team="Team Design / Video">
+                    <i class="fa-solid fa-clapperboard text-rose-500 mr-1"></i> Team Design / Video
+                </button>
+                <button onclick="filterMemberByTeam('Team Logistics / Kho')" class="team-filter-btn px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-200 transition whitespace-nowrap" data-team="Team Logistics / Kho">
+                    <i class="fa-solid fa-boxes-packing text-amber-500 mr-1"></i> Team Logistics / Kho
+                </button>
+                <button onclick="filterMemberByTeam('Team CSKH / Sales')" class="team-filter-btn px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-200 transition whitespace-nowrap" data-team="Team CSKH / Sales">
+                    <i class="fa-solid fa-headset text-emerald-500 mr-1"></i> Team CSKH / Sales
+                </button>
+            </div>
+
+            <!-- Members Grid Cards -->
+            <div id="membersGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Dynamic Loaded Members Cards -->
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: ADS & GA4 REPORTING ================= -->
+        <section id="view-ads" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">Báo Cáo Chi Tiết Quảng Cáo & Đo Lường GA4</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Theo dõi ngân sách, lượt click, chuyển đổi thực tế từ Google Analytics 4.</p>
+                </div>
+                <button onclick="openAdsModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-md shadow-brand-500/20 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Thêm Báo Cáo Ngày</span>
+                </button>
+            </div>
+
+            <!-- Table Card -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-medium text-slate-500">Kênh:</span>
+                        <select id="filterPlatform" onchange="renderAdsTable()" class="bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-1 text-xs focus:outline-none">
+                            <option value="ALL">Tất cả kênh</option>
+                            <option value="Facebook Ads">Facebook Ads</option>
+                            <option value="TikTok Ads">TikTok Ads</option>
+                            <option value="Google Ads">Google Ads</option>
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="searchAds" oninput="renderAdsTable()" placeholder="Tìm chiến dịch..." class="bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg pl-8 pr-3 py-1 text-xs focus:outline-none">
+                        <i class="fa-solid fa-search absolute left-2.5 top-2 text-slate-400 text-xs"></i>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-700">
+                                <th class="p-3">Ngày</th>
+                                <th class="p-3">Kênh</th>
+                                <th class="p-3">Chiến Dịch</th>
+                                <th class="p-3 text-right">Chi Tiêu (Spend)</th>
+                                <th class="p-3 text-right">Clicks</th>
+                                <th class="p-3 text-right">Chuyển Đổi (GA4)</th>
+                                <th class="p-3 text-right">Doanh Thu (GA4)</th>
+                                <th class="p-3 text-right">ROAS</th>
+                                <th class="p-3 text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adsTableBody" class="divide-y divide-slate-200 dark:divide-slate-700 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 5: STOCK & INVENTORY ================= -->
+        <section id="view-stock" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">Tracking Kho Hàng & Tồn SKU</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Kiểm soát số lượng sản phẩm chạy Ads, tránh cạn kho đột ngột.</p>
+                </div>
+                <button onclick="openStockModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-md shadow-brand-500/20 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Thêm SKU Mới</span>
+                </button>
+            </div>
+
+            <!-- Table Card -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-700">
+                                <th class="p-3">Mã SKU</th>
+                                <th class="p-3">Tên Sản Phẩm</th>
+                                <th class="p-3">Danh Mục</th>
+                                <th class="p-3 text-right">Giá Nhập</th>
+                                <th class="p-3 text-right">Giá Bán</th>
+                                <th class="p-3 text-center">Tồn Kho</th>
+                                <th class="p-3 text-center">Trạng Thái</th>
+                                <th class="p-3 text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody" class="divide-y divide-slate-200 dark:divide-slate-700 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODALS SECTION ================= -->
+
+    <!-- Modal 1: Task Assignment / Delegation Modal -->
+    <div id="taskModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/80">
+                <h3 id="taskModalTitle" class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-brand-600"></i>
+                    <span>Giao Việc Mới Cho Nhân Sự</span>
+                </h3>
+                <button onclick="closeTaskModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="taskForm" onsubmit="saveTaskData(event)" class="p-5 space-y-4 overflow-y-auto custom-scrollbar flex-grow">
+                <input type="hidden" id="taskId">
+                
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Tên công việc / Task Title *</label>
+                    <input type="text" id="taskTitle" placeholder="VD: Lên 5 video TikTok chạy Ads áo thun T10" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Phòng Ban / Team *</label>
+                        <select id="taskTeam" onchange="updateAssigneeDropdownByTeam()" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="Team Media / Ads">Team Media / Ads</option>
+                            <option value="Team Content">Team Content</option>
+                            <option value="Team Design / Video">Team Design / Video</option>
+                            <option value="Team Logistics / Kho">Team Logistics / Kho</option>
+                            <option value="Team CSKH / Sales">Team CSKH / Sales</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Người thực hiện (Assignee) *</label>
+                        <select id="taskAssignee" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <!-- Dynamic loaded -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Mức độ ưu tiên *</label>
+                        <select id="taskPriority" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="Gấp">Gấp (Urgent)</option>
+                            <option value="Cao">Cao</option>
+                            <option value="Trung bình" selected>Trung bình</option>
+                            <option value="Thấp">Thấp</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Kênh liên quan</label>
+                        <select id="taskChannel" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="Facebook Ads">Facebook Ads</option>
+                            <option value="TikTok Ads">TikTok Ads</option>
+                            <option value="Google Ads">Google Ads</option>
+                            <option value="GA4 Analytics">GA4 Analytics</option>
+                            <option value="Kho / Stock">Kho / Stock</option>
+                            <option value="Toàn hệ thống">Toàn hệ thống</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Trạng thái *</label>
+                        <select id="taskStatus" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="todo">Cần Làm (To Do)</option>
+                            <option value="inprogress">Đang Làm (In Progress)</option>
+                            <option value="inreview">Đang Review / Duyệt</option>
+                            <option value="done">Hoàn Thành (Done)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Hạn hoàn thành (Deadline) *</label>
+                        <input type="date" id="taskDeadline" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Điểm KPI / Trọng số (Points)</label>
+                        <input type="number" id="taskKpiPoints" min="1" max="100" value="10" placeholder="10" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Mô tả chi tiết & Yêu cầu công việc</label>
+                    <textarea id="taskDesc" rows="3" placeholder="Ghi rõ tiêu chuẩn hoàn thành, KPI hoặc đường link thiết kế/camp..." class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <button type="button" onclick="closeTaskModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-semibold hover:bg-slate-200 transition">Hủy</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold shadow-md transition">Lưu & Giao Việc</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Member Addition / Edit Modal -->
+    <div id="memberModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/80">
+                <h3 id="memberModalTitle" class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-brand-600"></i>
+                    <span>Thêm Nhân Sự Mới</span>
+                </h3>
+                <button onclick="closeMemberModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="memberForm" onsubmit="saveMemberData(event)" class="p-5 space-y-4">
+                <input type="hidden" id="memberId">
+                
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Họ và Tên *</label>
+                    <input type="text" id="memberName" placeholder="VD: Nguyễn Văn Anh" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Team / Phòng Ban *</label>
+                        <select id="memberTeam" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="Team Media / Ads">Team Media / Ads</option>
+                            <option value="Team Content">Team Content</option>
+                            <option value="Team Design / Video">Team Design / Video</option>
+                            <option value="Team Logistics / Kho">Team Logistics / Kho</option>
+                            <option value="Team CSKH / Sales">Team CSKH / Sales</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Chức vụ / Role *</label>
+                        <input type="text" id="memberRole" placeholder="Senior Facebook Ads" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Email liên hệ</label>
+                    <input type="email" id="memberEmail" placeholder="vananh@omnimanage.com" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <button type="button" onclick="closeMemberModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-semibold hover:bg-slate-200 transition">Hủy</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold shadow-md transition">Lưu Thành Viên</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: Ads Entry Modal -->
+    <div id="adsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/80">
+                <h3 id="adsModalTitle" class="font-bold text-base text-slate-900 dark:text-white">Thêm Báo Cáo Quảng Cáo & GA4</h3>
+                <button onclick="closeAdsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="adsForm" onsubmit="saveAdsData(event)" class="p-5 space-y-4">
+                <input type="hidden" id="adsId">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Ngày báo cáo</label>
+                        <input type="date" id="adsDate" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Kênh Quảng Cáo</label>
+                        <select id="adsPlatform" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="Facebook Ads">Facebook Ads</option>
+                            <option value="TikTok Ads">TikTok Ads</option>
+                            <option value="Google Ads">Google Ads</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Tên Chiến Dịch (Campaign Name)</label>
+                    <input type="text" id="adsCampaign" placeholder="VD: Camp_AoThun_Retargeting" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Chi Tiêu (VNĐ)</label>
+                        <input type="number" id="adsSpend" placeholder="5000000" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Lượt Clicks</label>
+                        <input type="number" id="adsClicks" placeholder="1200" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Chuyển Đổi GA4</label>
+                        <input type="number" id="adsConversions" placeholder="45" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Doanh Thu GA4 (VNĐ)</label>
+                        <input type="number" id="adsRevenue" placeholder="20000000" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <button type="button" onclick="closeAdsModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-semibold hover:bg-slate-200 transition">Hủy</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold shadow-md transition">Lưu Báo Cáo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 4: Stock Modal -->
+    <div id="stockModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/80">
+                <h3 id="stockModalTitle" class="font-bold text-base text-slate-900 dark:text-white">Thêm SKU Sản Phẩm Mới</h3>
+                <button onclick="closeStockModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="stockForm" onsubmit="saveStockData(event)" class="p-5 space-y-4">
+                <input type="hidden" id="stockId">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Mã SKU *</label>
+                        <input type="text" id="stockSku" placeholder="SKU-AT01" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Danh Mục</label>
+                        <input type="text" id="stockCategory" placeholder="Áo Thun" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Tên Sản Phẩm *</label>
+                    <input type="text" id="stockName" placeholder="Áo Thun Cotton Oversized Premium" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Giá Nhập (VNĐ)</label>
+                        <input type="number" id="stockCost" placeholder="120000" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Giá Bán (VNĐ)</label>
+                        <input type="number" id="stockPrice" placeholder="299000" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Số Lượng Tồn Kho Initial</label>
+                    <input type="number" id="stockQty" placeholder="150" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <button type="button" onclick="closeStockModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-semibold hover:bg-slate-200 transition">Hủy</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold shadow-md transition">Lưu Sản Phẩm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data Stores (LocalStorage fallback with rich initial mock)
+        let membersData = JSON.parse(localStorage.getItem('omni_members_v2')) || [
+            { id: 101, name: 'Nguyễn Văn Anh', team: 'Team Media / Ads', role: 'Senior Facebook Ads', email: 'vananh@omni.com', avatar: 'https://placehold.co/100x100/3b82f6/ffffff?text=VA' },
+            { id: 102, name: 'Trần Minh Quân', team: 'Team Media / Ads', role: 'TikTok & Google Specialist', email: 'minhquan@omni.com', avatar: 'https://placehold.co/100x100/6366f1/ffffff?text=MQ' },
+            { id: 103, name: 'Lê Thu Thảo', team: 'Team Content', role: 'Content Lead', email: 'thuthao@omni.com', avatar: 'https://placehold.co/100x100/ec4899/ffffff?text=TT' },
+            { id: 104, name: 'Phạm Hoàng Nam', team: 'Team Design / Video', role: 'Video Editor & Motion Graphic', email: 'hoangnam@omni.com', avatar: 'https://placehold.co/100x100/f59e0b/ffffff?text=HN' },
+            { id: 105, name: 'Đặng Quốc Bảo', team: 'Team Logistics / Kho', role: 'Quản Lý Tồn Kho', email: 'quocbao@omni.com', avatar: 'https://placehold.co/100x100/10b981/ffffff?text=QB' },
+            { id: 106, name: 'Vũ Hải Yến', team: 'Team CSKH / Sales', role: 'Leader Telesale & Online Support', email: 'haiyen@omni.com', avatar: 'https://placehold.co/100x100/8b5cf6/ffffff?text=HY' }
+        ];
+
+        let taskData = JSON.parse(localStorage.getItem('omni_tasks_v2')) || [
+            { id: 1, title: 'Optimise Camp Facebook Ads BST Thu Đông', team: 'Team Media / Ads', assignee: 'Nguyễn Văn Anh', priority: 'Gấp', channel: 'Facebook Ads', status: 'inprogress', deadline: '2026-10-15', kpiPoints: 15, desc: 'Target nhóm Lookalike 3% khách cũ, tăng ngân sách lên 10M/ngày.' },
+            { id: 2, title: 'Dựng 3 Video Review Áo Hoodies Trend TikTok', team: 'Team Design / Video', assignee: 'Phạm Hoàng Nam', priority: 'Cao', channel: 'TikTok Ads', status: 'inreview', deadline: '2026-10-14', kpiPoints: 20, desc: 'Hook 3s đầu thật cuốn, xuất file 4K chuẩn tỉ lệ 9:16.' },
+            { id: 3, title: 'Viết Bài SEO Landing Page Chạy Google Search', team: 'Team Content', assignee: 'Lê Thu Thảo', priority: 'Trung bình', channel: 'Google Ads', status: 'todo', deadline: '2026-10-18', kpiPoints: 10, desc: 'Tập trung các từ khóa: Áo thun nam đẹp, Hoodie unisex.' },
+            { id: 4, title: 'Kiểm kê nhập hàng đợt 2 cho SKU-HD03', team: 'Team Logistics / Kho', assignee: 'Đặng Quốc Bảo', priority: 'Gấp', channel: 'Kho / Stock', status: 'done', deadline: '2026-10-11', kpiPoints: 12, desc: 'Đã cập nhật đủ 200 chiếc vào kho dữ liệu hệ thống.' }
+        ];
+
+        let adsData = JSON.parse(localStorage.getItem('omni_ads_v2')) || [
+            { id: 1, date: '2026-10-11', platform: 'Facebook Ads', campaign: 'Retargeting Khách Cũ T10', spend: 4500000, clicks: 1820, conversions: 68, revenue: 23500000 },
+            { id: 2, date: '2026-10-11', platform: 'TikTok Ads', campaign: 'Video Viral Review SP Mới', spend: 6000000, clicks: 3500, conversions: 84, revenue: 29000000 },
+            { id: 3, date: '2026-10-10', platform: 'Google Ads', campaign: 'Search Từ Khóa Thương Hiệu', spend: 2500000, clicks: 1100, conversions: 52, revenue: 18000000 },
+            { id: 4, date: '2026-10-10', platform: 'Facebook Ads', campaign: 'Prospecting Lookalike 5%', spend: 5000000, clicks: 2100, conversions: 48, revenue: 16500000 }
+        ];
+
+        let stockData = JSON.parse(localStorage.getItem('omni_stock_v2')) || [
+            { id: 1, sku: 'SKU-AT01', name: 'Áo Thun Cotton Oversized', category: 'Áo Thun', cost: 120000, price: 299000, qty: 18 },
+            { id: 2, sku: 'SKU-QN02', name: 'Quần Jogger Unisex Khaki', category: 'Quần', cost: 180000, price: 389000, qty: 120 },
+            { id: 3, sku: 'SKU-HD03', name: 'Hoodie Zip Local Brand', category: 'Áo Khoác', cost: 250000, price: 550000, qty: 8 }
+        ];
+
+        let currentMemberTeamFilter = 'ALL';
+        let currentTaskViewMode = 'kanban';
+        let spendChartInstance = null;
+        let platformChartInstance = null;
+
+        window.onload = function() {
+            initCharts();
+            renderDashboardStats();
+            renderTeamMembers();
+            populateAssigneeDropdowns();
+            renderTasks();
+            renderAdsTable();
+            renderStockTable();
+            updateHeaderCounts();
+        };
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = "fa-solid fa-moon";
+            } else {
+                html.classList.add('dark');
+                icon.className = "fa-solid fa-sun text-amber-400";
+            }
+        }
+
+        // Navigation Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('section[id^="view-"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-brand-600', 'text-brand-600', 'dark:text-brand-400');
+                el.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+            });
+
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-' + tabId);
+            activeBtn.classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+            activeBtn.classList.add('border-brand-600', 'text-brand-600', 'dark:text-brand-400');
+
+            if(tabId === 'dashboard') renderDashboardStats();
+            if(tabId === 'teams') renderTeamMembers();
+            if(tabId === 'workflow') renderTasks();
+        }
+
+        function formatVND(num) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
+        }
+
+        function updateHeaderCounts() {
+            document.getElementById('headerMemberCount').innerText = membersData.length;
+        }
+
+        function initCharts() {
+            const ctx1 = document.getElementById('spendRevenueChart').getContext('2d');
+            spendChartInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['06/10', '07/10', '08/10', '09/10', '10/10', '11/10'],
+                    datasets: [
+                        { label: 'Chi Tiêu Ads (VNĐ)', data: [9500000, 10200000, 11500000, 13000000, 12500000, 18000000], backgroundColor: '#6366f1', borderRadius: 6 },
+                        { label: 'Doanh Thu GA4 (VNĐ)', data: [31000000, 34000000, 39000000, 45000000, 42000000, 70500000], backgroundColor: '#10b981', borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { grid: { color: 'rgba(200, 200, 200, 0.1)' } }, x: { grid: { display: false } } }
+                }
+            });
+
+            const ctx2 = document.getElementById('platformChart').getContext('2d');
+            platformChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Facebook Ads', 'TikTok Ads', 'Google Ads'],
+                    datasets: [{
+                        data: [50, 35, 15],
+                        backgroundColor: ['#3b82f6', '#0f172a', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function renderDashboardStats() {
+            let totalSpend = adsData.reduce((sum, item) => sum + Number(item.spend), 0);
+            let totalRevenue = adsData.reduce((sum, item) => sum + Number(item.revenue), 0);
+            let avgRoas = totalSpend > 0 ? (totalRevenue / totalSpend).toFixed(2) : '0.0';
+            let openTasks = taskData.filter(t => t.status !== 'done').length;
+            let lowStockCount = stockData.filter(s => s.qty < 20).length;
+
+            document.getElementById('metricTotalSpend').innerText = formatVND(totalSpend);
+            document.getElementById('metricTotalRevenue').innerText = formatVND(totalRevenue);
+            document.getElementById('metricAvgRoas').innerText = avgRoas + 'x';
+            document.getElementById('metricTaskStats').innerText = openTasks + ' Việc Mở';
+            document.getElementById('metricLowStock').innerText = lowStockCount + ' SKU hết kho';
+        }
+
+        function filterMemberByTeam(team) {
+            currentMemberTeamFilter = team;
+            document.querySelectorAll('.team-filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-team') === team) {
+                    btn.className = "team-filter-btn px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-sm transition whitespace-nowrap";
+                } else {
+                    btn.className = "team-filter-btn px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-200 transition whitespace-nowrap";
+                }
+            });
+            renderTeamMembers();
+        }
+
+        function renderTeamMembers() {
+            const grid = document.getElementById('membersGrid');
+            grid.innerHTML = '';
+
+            const filtered = membersData.filter(m => currentMemberTeamFilter === 'ALL' || m.team === currentMemberTeamFilter);
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400">Chưa có nhân sự nào trong team này.</div>`;
+                return;
+            }
+
+            filtered.forEach(m => {
+                // Count member active tasks
+                const memberTasks = taskData.filter(t => t.assignee === m.name);
+                const activeTaskCount = memberTasks.filter(t => t.status !== 'done').length;
+
+                grid.innerHTML += `
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4 hover:shadow-md transition">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center space-x-3">
+                                <img src="${m.avatar}" class="w-12 h-12 rounded-2xl object-cover border-2 border-brand-500 shadow-sm" alt="${m.name}">
+                                <div>
+                                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">${m.name}</h3>
+                                    <span class="text-xs text-brand-600 dark:text-brand-400 font-medium block">${m.role}</span>
+                                    <span class="text-[11px] text-slate-400 block">${m.email || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <button onclick="deleteMember(${m.id})" class="text-slate-300 hover:text-rose-500 p-1"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-xs">
+                            <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg font-medium">${m.team}</span>
+                            <span class="text-slate-500 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-list-check text-brand-500"></i>
+                                <strong>${activeTaskCount}</strong> việc đang chạy
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function populateAssigneeDropdowns() {
+            const taskAssigneeSelect = document.getElementById('taskAssignee');
+            const taskFilterAssignee = document.getElementById('taskFilterAssignee');
+            
+            taskFilterAssignee.innerHTML = '<option value="ALL">Tất cả người làm</option>';
+            membersData.forEach(m => {
+                taskFilterAssignee.innerHTML += `<option value="${m.name}">${m.name} (${m.team})</option>`;
+            });
+
+            updateAssigneeDropdownByTeam();
+        }
+
+        function updateAssigneeDropdownByTeam() {
+            const selectedTeam = document.getElementById('taskTeam').value;
+            const taskAssigneeSelect = document.getElementById('taskAssignee');
+            taskAssigneeSelect.innerHTML = '';
+
+            const teamMembers = membersData.filter(m => m.team === selectedTeam);
+            if(teamMembers.length === 0) {
+                taskAssigneeSelect.innerHTML = `<option value="">-- Không có nhân sự team này --</option>`;
+                return;
+            }
+
+            teamMembers.forEach(m => {
+                taskAssigneeSelect.innerHTML += `<option value="${m.name}">${m.name} (${m.role})</option>`;
+            });
+        }
+
+        function openMemberModal() {
+            document.getElementById('memberForm').reset();
+            document.getElementById('memberId').value = '';
+            document.getElementById('memberModal').classList.remove('hidden');
+        }
+
+        function closeMemberModal() {
+            document.getElementById('memberModal').classList.add('hidden');
+        }
+
+        function saveMemberData(e) {
+            e.preventDefault();
+            const name = document.getElementById('memberName').value;
+            const team = document.getElementById('memberTeam').value;
+            const role = document.getElementById('memberRole').value;
+            const email = document.getElementById('memberEmail').value;
+
+            const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+            const newMember = {
+                id: Date.now(),
+                name: name,
+                team: team,
+                role: role,
+                email: email,
+                avatar: `https://placehold.co/100x100/4f46e5/ffffff?text=${initials}`
+            };
+
+            membersData.unshift(newMember);
+            localStorage.setItem('omni_members_v2', JSON.stringify(membersData));
+            closeMemberModal();
+            renderTeamMembers();
+            populateAssigneeDropdowns();
+            updateHeaderCounts();
+        }
+
+        function deleteMember(id) {
+            if(confirm('Bạn có chắc muốn xóa nhân sự này khỏi danh sách?')) {
+                membersData = membersData.filter(m => m.id !== id);
+                localStorage.setItem('omni_members_v2', JSON.stringify(membersData));
+                renderTeamMembers();
+                populateAssigneeDropdowns();
+                updateHeaderCounts();
+            }
+        }
+
+        function setTaskView(mode) {
+            currentTaskViewMode = mode;
+            if(mode === 'kanban') {
+                document.getElementById('taskKanbanContainer').classList.remove('hidden');
+                document.getElementById('taskListContainer').classList.add('hidden');
+                document.getElementById('btnViewKanban').className = "px-3 py-1.5 rounded-lg font-medium transition bg-white dark:bg-slate-800 shadow-sm text-brand-600 dark:text-brand-400";
+                document.getElementById('btnViewList').className = "px-3 py-1.5 rounded-lg font-medium transition text-slate-500 dark:text-slate-400 hover:text-slate-800";
+            } else {
+                document.getElementById('taskKanbanContainer').classList.add('hidden');
+                document.getElementById('taskListContainer').classList.remove('hidden');
+                document.getElementById('btnViewKanban').className = "px-3 py-1.5 rounded-lg font-medium transition text-slate-500 dark:text-slate-400 hover:text-slate-800";
+                document.getElementById('btnViewList').className = "px-3 py-1.5 rounded-lg font-medium transition bg-white dark:bg-slate-800 shadow-sm text-brand-600 dark:text-brand-400";
+            }
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const teamFilter = document.getElementById('taskFilterTeam').value;
+            const assigneeFilter = document.getElementById('taskFilterAssignee').value;
+            const priorityFilter = document.getElementById('taskFilterPriority').value;
+            const keyword = document.getElementById('taskSearchKeyword').value.toLowerCase();
+
+            const filteredTasks = taskData.filter(t => {
+                const matchTeam = (teamFilter === 'ALL' || t.team === teamFilter);
+                const matchAssignee = (assigneeFilter === 'ALL' || t.assignee === assigneeFilter);
+                const matchPriority = (priorityFilter === 'ALL' || t.priority === priorityFilter);
+                const matchKey = t.title.toLowerCase().includes(keyword) || (t.desc && t.desc.toLowerCase().includes(keyword));
+                return matchTeam && matchAssignee && matchPriority && matchKey;
+            });
+
+            if(currentTaskViewMode === 'kanban') {
+                renderKanbanView(filteredTasks);
+            } else {
+                renderListView(filteredTasks);
+            }
+        }
+
+        function getPriorityBadge(priority) {
+            if(priority === 'Gấp') return `<span class="px-2 py-0.5 bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300 rounded font-bold text-[10px]"><i class="fa-solid fa-fire mr-1"></i>Gấp</span>`;
+            if(priority === 'Cao') return `<span class="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 rounded font-semibold text-[10px]">Cao</span>`;
+            if(priority === 'Trung bình') return `<span class="px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded font-semibold text-[10px]">Trung bình</span>`;
+            return `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 rounded font-medium text-[10px]">Thấp</span>`;
+        }
+
+        function renderKanbanView(tasks) {
+            const colTodo = document.getElementById('colTodo');
+            const colInProgress = document.getElementById('colInProgress');
+            const colInReview = document.getElementById('colInReview');
+            const colDone = document.getElementById('colDone');
+
+            colTodo.innerHTML = '';
+            colInProgress.innerHTML = '';
+            colInReview.innerHTML = '';
+            colDone.innerHTML = '';
+
+            let cTodo = 0, cInProgress = 0, cInReview = 0, cDone = 0;
+
+            tasks.forEach(task => {
+                const pBadge = getPriorityBadge(task.priority);
+                const taskCardHtml = `
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3 transition hover:border-brand-500/50">
+                        <div class="flex items-center justify-between">
+                            ${pBadge}
+                            <span class="text-[10px] font-semibold text-slate-400"><i class="fa-solid fa-clock mr-1"></i>${task.deadline || 'No deadline'}</span>
+                        </div>
+                        
+                        <h4 class="font-bold text-xs leading-snug text-slate-800 dark:text-slate-100">${task.title}</h4>
+                        
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">${task.desc || 'Chưa có mô tả chi tiết.'}</p>
+                        
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-[11px]">
+                            <div class="flex items-center space-x-1.5">
+                                <div class="w-5 h-5 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-[9px]">
+                                    ${task.assignee ? task.assignee[0] : 'U'}
+                                </div>
+                                <span class="font-medium text-slate-700 dark:text-slate-300">${task.assignee}</span>
+                            </div>
+                            <span class="text-brand-600 dark:text-brand-400 font-bold">${task.kpiPoints || 10} KPI</span>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1">
+                            <select onchange="quickUpdateTaskStatus(${task.id}, this.value)" class="text-[10px] bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-1.5 py-1 focus:outline-none">
+                                <option value="todo" ${task.status==='todo'?'selected':''}>Cần làm</option>
+                                <option value="inprogress" ${task.status==='inprogress'?'selected':''}>Đang làm</option>
+                                <option value="inreview" ${task.status==='inreview'?'selected':''}>Review</option>
+                                <option value="done" ${task.status==='done'?'selected':''}>Done</option>
+                            </select>
+
+                            <div class="flex items-center space-x-1">
+                                <button onclick="deleteTask(${task.id})" class="text-slate-300 hover:text-rose-500 p-1" title="Xóa task"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if(task.status === 'todo') { colTodo.innerHTML += taskCardHtml; cTodo++; }
+                else if(task.status === 'inprogress') { colInProgress.innerHTML += taskCardHtml; cInProgress++; }
+                else if(task.status === 'inreview') { colInReview.innerHTML += taskCardHtml; cInReview++; }
+                else { colDone.innerHTML += taskCardHtml; cDone++; }
+            });
+
+            document.getElementById('countTodo').innerText = cTodo;
+            document.getElementById('countInProgress').innerText = cInProgress;
+            document.getElementById('countInReview').innerText = cInReview;
+            document.getElementById('countDone').innerText = cDone;
+        }
+
+        function renderListView(tasks) {
+            const tbody = document.getElementById('taskListBody');
+            tbody.innerHTML = '';
+
+            if(tasks.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">Không tìm thấy công việc nào phù hợp.</td></tr>`;
+                return;
+            }
+
+            tasks.forEach(t => {
+                let statusBadge = '';
+                if(t.status === 'todo') statusBadge = '<span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-semibold">Cần làm</span>';
+                else if(t.status === 'inprogress') statusBadge = '<span class="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Đang làm</span>';
+                else if(t.status === 'inreview') statusBadge = '<span class="px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">Đang Review</span>';
+                else statusBadge = '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">Hoàn thành</span>';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition">
+                        <td class="p-3">
+                            <div class="font-semibold text-slate-800 dark:text-slate-100">${t.title}</div>
+                            <div class="text-xs text-slate-400">${t.desc || ''}</div>
+                        </td>
+                        <td class="p-3">
+                            <div class="font-medium text-slate-700 dark:text-slate-300">${t.assignee}</div>
+                            <div class="text-xs text-slate-400">${t.team}</div>
+                        </td>
+                        <td class="p-3 text-xs font-medium text-brand-600 dark:text-brand-400">${t.channel || 'Khác'}</td>
+                        <td class="p-3 text-center">${getPriorityBadge(t.priority)}</td>
+                        <td class="p-3 text-xs text-slate-500">${t.deadline}</td>
+                        <td class="p-3 text-center font-bold text-brand-600">${t.kpiPoints || 10} pts</td>
+                        <td class="p-3 text-center">${statusBadge}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteTask(${t.id})" class="text-slate-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openTaskModal() {
+            document.getElementById('taskForm').reset();
+            document.getElementById('taskId').value = '';
+            document.getElementById('taskDeadline').value = new Date().toISOString().split('T')[0];
+            updateAssigneeDropdownByTeam();
+            document.getElementById('taskModal').classList.remove('hidden');
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.add('hidden');
+        }
+
+        function saveTaskData(e) {
+            e.preventDefault();
+            const newTask = {
+                id: Date.now(),
+                title: document.getElementById('taskTitle').value,
+                team: document.getElementById('taskTeam').value,
+                assignee: document.getElementById('taskAssignee').value,
+                priority: document.getElementById('taskPriority').value,
+                channel: document.getElementById('taskChannel').value,
+                status: document.getElementById('taskStatus').value,
+                deadline: document.getElementById('taskDeadline').value,
+                kpiPoints: Number(document.getElementById('taskKpiPoints').value),
+                desc: document.getElementById('taskDesc').value
+            };
+
+            taskData.unshift(newTask);
+            localStorage.setItem('omni_tasks_v2', JSON.stringify(taskData));
+            closeTaskModal();
+            renderTasks();
+            renderDashboardStats();
+            renderTeamMembers();
+        }
+
+        function quickUpdateTaskStatus(id, newStatus) {
+            const task = taskData.find(t => t.id === id);
+            if(task) {
+                task.status = newStatus;
+                localStorage.setItem('omni_tasks_v2', JSON.stringify(taskData));
+                renderTasks();
+                renderDashboardStats();
+                renderTeamMembers();
+            }
+        }
+
+        function deleteTask(id) {
+            if(confirm('Bạn có chắc muốn xóa công việc này?')) {
+                taskData = taskData.filter(t => t.id !== id);
+                localStorage.setItem('omni_tasks_v2', JSON.stringify(taskData));
+                renderTasks();
+                renderDashboardStats();
+                renderTeamMembers();
+            }
+        }
+
+        function renderAdsTable() {
+            const filter = document.getElementById('filterPlatform').value;
+            const search = document.getElementById('searchAds').value.toLowerCase();
+            const tbody = document.getElementById('adsTableBody');
+            tbody.innerHTML = '';
+
+            const filtered = adsData.filter(item => {
+                const matchPlatform = (filter === 'ALL' || item.platform === filter);
+                const matchSearch = item.campaign.toLowerCase().includes(search);
+                return matchPlatform && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">Không tìm thấy dữ liệu quảng cáo.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const roas = item.spend > 0 ? (item.revenue / item.spend).toFixed(2) : 0;
+                let platformBadge = '';
+                if(item.platform === 'Facebook Ads') platformBadge = '<span class="px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded text-xs font-semibold">Facebook</span>';
+                else if(item.platform === 'TikTok Ads') platformBadge = '<span class="px-2 py-0.5 bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200 rounded text-xs font-semibold">TikTok</span>';
+                else platformBadge = '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 rounded text-xs font-semibold">Google</span>';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition">
+                        <td class="p-3 text-slate-500">${item.date}</td>
+                        <td class="p-3">${platformBadge}</td>
+                        <td class="p-3 font-medium">${item.campaign}</td>
+                        <td class="p-3 text-right font-semibold text-rose-600">${formatVND(item.spend)}</td>
+                        <td class="p-3 text-right">${Number(item.clicks).toLocaleString()}</td>
+                        <td class="p-3 text-right text-brand-600 font-semibold">${Number(item.conversions).toLocaleString()}</td>
+                        <td class="p-3 text-right font-semibold text-emerald-600">${formatVND(item.revenue)}</td>
+                        <td class="p-3 text-right font-bold">${roas}x</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteAds(${item.id})" class="text-slate-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openAdsModal() {
+            document.getElementById('adsForm').reset();
+            document.getElementById('adsId').value = '';
+            document.getElementById('adsDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('adsModal').classList.remove('hidden');
+        }
+
+        function closeAdsModal() {
+            document.getElementById('adsModal').classList.add('hidden');
+        }
+
+        function saveAdsData(e) {
+            e.preventDefault();
+            const newEntry = {
+                id: Date.now(),
+                date: document.getElementById('adsDate').value,
+                platform: document.getElementById('adsPlatform').value,
+                campaign: document.getElementById('adsCampaign').value,
+                spend: Number(document.getElementById('adsSpend').value),
+                clicks: Number(document.getElementById('adsClicks').value),
+                conversions: Number(document.getElementById('adsConversions').value),
+                revenue: Number(document.getElementById('adsRevenue').value)
+            };
+
+            adsData.unshift(newEntry);
+            localStorage.setItem('omni_ads_v2', JSON.stringify(adsData));
+            closeAdsModal();
+            renderAdsTable();
+            renderDashboardStats();
+        }
+
+        function deleteAds(id) {
+            if(confirm('Bạn có chắc muốn xóa bản ghi quảng cáo này?')) {
+                adsData = adsData.filter(i => i.id !== id);
+                localStorage.setItem('omni_ads_v2', JSON.stringify(adsData));
+                renderAdsTable();
+                renderDashboardStats();
+            }
+        }
+
+        function renderStockTable() {
+            const tbody = document.getElementById('stockTableBody');
+            tbody.innerHTML = '';
+
+            stockData.forEach(item => {
+                let statusHtml = '';
+                if(item.qty <= 10) {
+                    statusHtml = '<span class="px-2.5 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300 rounded-full text-xs font-semibold">Sắp hết hàng</span>';
+                } else if(item.qty < 30) {
+                    statusHtml = '<span class="px-2.5 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 rounded-full text-xs font-semibold">Cần nhập thêm</span>';
+                } else {
+                    statusHtml = '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 rounded-full text-xs font-semibold">Ổn định</span>';
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition">
+                        <td class="p-3 font-mono font-semibold text-brand-600">${item.sku}</td>
+                        <td class="p-3 font-medium">${item.name}</td>
+                        <td class="p-3 text-slate-500">${item.category}</td>
+                        <td class="p-3 text-right">${formatVND(item.cost)}</td>
+                        <td class="p-3 text-right font-semibold">${formatVND(item.price)}</td>
+                        <td class="p-3 text-center font-bold text-base">${item.qty}</td>
+                        <td class="p-3 text-center">${statusHtml}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="adjustStock(${item.id})" class="text-slate-400 hover:text-brand-600 p-1 mr-2"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteStock(${item.id})" class="text-slate-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openStockModal() {
+            document.getElementById('stockForm').reset();
+            document.getElementById('stockId').value = '';
+            document.getElementById('stockModal').classList.remove('hidden');
+        }
+
+        function closeStockModal() {
+            document.getElementById('stockModal').classList.add('hidden');
+        }
+
+        function saveStockData(e) {
+            e.preventDefault();
+            const skuObj = {
+                id: Date.now(),
+                sku: document.getElementById('stockSku').value,
+                name: document.getElementById('stockName').value,
+                category: document.getElementById('stockCategory').value,
+                cost: Number(document.getElementById('stockCost').value),
+                price: Number(document.getElementById('stockPrice').value),
+                qty: Number(document.getElementById('stockQty').value)
+            };
+
+            stockData.unshift(skuObj);
+            localStorage.setItem('omni_stock_v2', JSON.stringify(stockData));
+            closeStockModal();
+            renderStockTable();
+            renderDashboardStats();
+        }
+
+        function adjustStock(id) {
+            const item = stockData.find(i => i.id === id);
+            if(!item) return;
+            let newQty = prompt(`Nhập tồn kho mới cho [${item.sku}] ${item.name}:`, item.qty);
+            if(newQty !== null && !isNaN(newQty)) {
+                item.qty = Number(newQty);
+                localStorage.setItem('omni_stock_v2', JSON.stringify(stockData));
+                renderStockTable();
+                renderDashboardStats();
+            }
+        }
+
+        function deleteStock(id) {
+            if(confirm('Bạn có chắc muốn xóa SKU này?')) {
+                stockData = stockData.filter(i => i.id !== id);
+                localStorage.setItem('omni_stock_v2', JSON.stringify(stockData));
+                renderStockTable();
+                renderDashboardStats();
+            }
+        }
+    </script>
+</body>
+</html>
